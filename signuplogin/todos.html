@@ -61,59 +61,87 @@
     <ul id="todoList"></ul>
 
     <h2>특정 할 일 조회</h2>
-    <input type="number" id="todoIdInput" placeholder="ID를 입력하세요" />
+    <input
+      type="text"
+      id="todoTextInput"
+      placeholder="할 일 텍스트를 입력하세요"
+    />
     <button onclick="findTodo()">조회</button>
     <div id="findResult"></div>
 
     <script>
       const token = localStorage.getItem("token");
 
+      // 로그인되지 않았을 때 로그인 페이지로 리디렉션
+      if (!token) {
+        alert("로그인이 필요합니다!");
+        window.location.href = "/login.html";
+      }
+
       async function loadTodos() {
-        const res = await fetch("/todos", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const todos = await res.json();
+        try {
+          const res = await fetch("/todos", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-        const list = document.getElementById("todoList");
-        list.innerHTML = "";
+          if (!res.ok) {
+            throw new Error(`할 일 목록 불러오기 실패: ${res.status}`);
+          }
 
-        todos.forEach((todo) => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-          <span contentEditable="false">${todo.title}</span>
-          <div class="controls">
-            <button onclick="editTodo(${todo.id}, this)">수정</button>
-            <button onclick="deleteTodo(${todo.id})">삭제</button>
-          </div>`;
-          list.appendChild(li);
-        });
+          const todos = await res.json();
+          if (!Array.isArray(todos)) {
+            throw new Error("할 일 데이터가 배열이 아닙니다.");
+          }
+
+          const list = document.getElementById("todoList");
+          list.innerHTML = "";
+
+          todos.forEach((todo) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                      <span contentEditable="false">${todo.task_list}</span>
+                      <div class="controls">
+                        <button onclick="editTodo(${todo.task_id}, this)">수정</button>
+                        <button onclick="deleteTodo(${todo.task_id})">삭제</button>
+                      </div>`;
+            list.appendChild(li);
+          });
+        } catch (error) {
+          console.error(error);
+          alert("할 일 목록을 불러오는 중 오류가 발생했습니다.");
+        }
       }
 
       async function addTodo() {
         const input = document.getElementById("todoInput");
-        const text = input.value.trim();
-        if (!text) return;
+        const task_list = input.value.trim();
+        if (!task_list) return;
 
-        await fetch("/todos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: text,
-            description: "",
-            due_date: null,
-          }),
-        });
+        try {
+          const res = await fetch("/todos", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ task_list }),
+          });
 
-        input.value = "";
-        loadTodos();
+          if (!res.ok) {
+            throw new Error(`할 일 추가 실패: ${res.status}`);
+          }
+
+          input.value = "";
+          loadTodos();
+        } catch (error) {
+          console.error(error);
+          alert("할 일을 추가하는 중 오류가 발생했습니다.");
+        }
       }
 
-      async function editTodo(id, btn) {
+      async function editTodo(task_id, btn) {
         const li = btn.closest("li");
         const span = li.querySelector("span");
         const deleteBtn = li.querySelector("button:nth-child(2)");
@@ -125,45 +153,89 @@
           deleteBtn.style.display = "none";
         } else {
           span.contentEditable = false;
-          await fetch(`/todos/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ title: span.textContent }),
-          });
-          btn.textContent = "수정";
-          deleteBtn.style.display = "inline";
+
+          try {
+            const res = await fetch(`/todos/${task_id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ task_list: span.textContent }),
+            });
+
+            if (!res.ok) {
+              throw new Error(`할 일 수정 실패: ${res.status}`);
+            }
+
+            btn.textContent = "수정";
+            deleteBtn.style.display = "inline";
+          } catch (error) {
+            console.error(error);
+            alert("할 일 수정 중 오류가 발생했습니다.");
+          }
         }
       }
 
-      async function deleteTodo(id) {
-        await fetch(`/todos/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        loadTodos();
+      async function deleteTodo(task_id) {
+        try {
+          const res = await fetch(`/todos/${task_id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!res.ok) {
+            throw new Error(`할 일 삭제 실패: ${res.status}`);
+          }
+
+          loadTodos();
+        } catch (error) {
+          console.error(error);
+          alert("할 일 삭제 중 오류가 발생했습니다.");
+        }
       }
 
       async function findTodo() {
-        const id = document.getElementById("todoIdInput").value.trim();
-        if (!id) return;
+        const text = document.getElementById("todoTextInput").value.trim();
+        if (!text) return;
 
-        const res = await fetch(`/todos/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const resultDiv = document.getElementById("findResult");
+        try {
+          const res = await fetch(
+            `/todos/search?task_list=${encodeURIComponent(text)}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-        if (res.ok) {
-          const todo = await res.json();
-          resultDiv.innerHTML = `<p>할 일 제목: ${todo.title}</p>`;
-        } else {
-          resultDiv.innerHTML = `<p>할 일을 찾을 수 없습니다.</p>`;
+          const resultDiv = document.getElementById("findResult");
+
+          if (res.ok) {
+            const todos = await res.json();
+            if (todos.length > 0) {
+              resultDiv.innerHTML = todos
+                .map(
+                  (todo) => `
+              <div>
+                <p><strong>내용:</strong> ${todo.task_list}</p>
+                <p><strong>작성자:</strong> ${todo.userid}</p>
+                <p><strong>작성일:</strong> ${new Date(
+                  todo.created_at
+                ).toLocaleString()}</p>
+              </div><hr/>
+            `
+                )
+                .join("");
+            } else {
+              resultDiv.innerHTML = `<p>할 일을 찾을 수 없습니다.</p>`;
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          alert("할 일 조회 중 오류가 발생했습니다.");
         }
       }
 

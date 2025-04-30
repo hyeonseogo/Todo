@@ -5,7 +5,7 @@
     "width": 2000,
     "height": 2000,
     "scrollTop": 0,
-    "scrollLeft": 0,
+    "scrollLeft": -1,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -94,7 +94,7 @@
           "SvPNWW9nXUWneYlDv-hDx"
         ],
         "ui": {
-          "x": 151,
+          "x": 148,
           "y": 306,
           "zIndex": 9,
           "widthName": 60,
@@ -102,7 +102,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1746022741544,
+          "updateAt": 1746027450765,
           "createAt": 1745999249381
         }
       }
@@ -397,7 +397,7 @@
           "columnIds": [
             "Yi1MbBgsipNb1nbvrDD4P"
           ],
-          "x": 400,
+          "x": 397,
           "y": 306,
           "direction": 4
         },
