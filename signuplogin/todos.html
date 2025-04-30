@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TodoList</title>
+    <style>
+      @font-face {
+        font-family: "Ownglyph_corncorn-Rg";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2412-1@1.0/Ownglyph_corncorn-Rg.woff2")
+          format("woff2");
+      }
+      body {
+        font-family: Ownglyph_corncorn-Rg;
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+      }
+      input,
+      button {
+        font-family: Ownglyph_corncorn-Rg;
+        font-size: 1.5rem;
+        padding: 8px;
+        margin-right: 5px;
+      }
+      button:hover {
+        transform: scale(1.2);
+      }
+      button {
+        background-color: beige;
+        border-radius: 50%;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        font-size: 1.5rem;
+        padding: 8px;
+        margin: 5px 0;
+        background: #f0f0f0;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .controls button {
+        margin-left: 5px;
+      }
+      span {
+        margin: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>나의 할 일</h2>
+    <input type="text" id="todoInput" placeholder="할 일을 입력하세요" />
+    <button onclick="addTodo()">추가</button>
+
+    <h2>할 일 목록</h2>
+    <ul id="todoList"></ul>
+
+    <h2>특정 할 일 조회</h2>
+    <input type="number" id="todoIdInput" placeholder="ID를 입력하세요" />
+    <button onclick="findTodo()">조회</button>
+    <div id="findResult"></div>
+
+    <script>
+      const token = localStorage.getItem("token");
+
+      async function loadTodos() {
+        const res = await fetch("/todos", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const todos = await res.json();
+
+        const list = document.getElementById("todoList");
+        list.innerHTML = "";
+
+        todos.forEach((todo) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+          <span contentEditable="false">${todo.title}</span>
+          <div class="controls">
+            <button onclick="editTodo(${todo.id}, this)">수정</button>
+            <button onclick="deleteTodo(${todo.id})">삭제</button>
+          </div>`;
+          list.appendChild(li);
+        });
+      }
+
+      async function addTodo() {
+        const input = document.getElementById("todoInput");
+        const text = input.value.trim();
+        if (!text) return;
+
+        await fetch("/todos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: text,
+            description: "",
+            due_date: null,
+          }),
+        });
+
+        input.value = "";
+        loadTodos();
+      }
+
+      async function editTodo(id, btn) {
+        const li = btn.closest("li");
+        const span = li.querySelector("span");
+        const deleteBtn = li.querySelector("button:nth-child(2)");
+
+        if (btn.textContent === "수정") {
+          span.contentEditable = true;
+          span.focus();
+          btn.textContent = "저장";
+          deleteBtn.style.display = "none";
+        } else {
+          span.contentEditable = false;
+          await fetch(`/todos/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ title: span.textContent }),
+          });
+          btn.textContent = "수정";
+          deleteBtn.style.display = "inline";
+        }
+      }
+
+      async function deleteTodo(id) {
+        await fetch(`/todos/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        loadTodos();
+      }
+
+      async function findTodo() {
+        const id = document.getElementById("todoIdInput").value.trim();
+        if (!id) return;
+
+        const res = await fetch(`/todos/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const resultDiv = document.getElementById("findResult");
+
+        if (res.ok) {
+          const todo = await res.json();
+          resultDiv.innerHTML = `<p>할 일 제목: ${todo.title}</p>`;
+        } else {
+          resultDiv.innerHTML = `<p>할 일을 찾을 수 없습니다.</p>`;
+        }
+      }
+
+      window.onload = loadTodos;
+    </script>
+  </body>
+</html>
