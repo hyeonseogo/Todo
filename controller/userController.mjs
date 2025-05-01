@@ -1,14 +1,18 @@
 import { db } from "../data/db.mjs";
+import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { jwtSecret } from "../config.mjs";
+import { config } from "../config.mjs";
 
 export async function signup(req, res) {
   console.log("회원가입 요청 받음:", req.body);
   const { userid, userpw, name, email } = req.body;
+
   try {
+    const hashedPassword = await bcrypt.hash(userpw, config.bcrypt.saltRounds);
+
     const [result] = await db.query(
       "INSERT INTO users (userid, userpw, name, email) VALUES (?, ?, ?, ?)",
-      [userid, userpw, name, email]
+      [userid, hashedPassword, name, email]
     );
     res.status(201).json({ userId: result.insertId });
   } catch (err) {
@@ -19,20 +23,29 @@ export async function signup(req, res) {
 
 export async function login(req, res) {
   const { userid, userpw } = req.body;
-  const [rows] = await db.query(
-    "SELECT * FROM users WHERE userid = ? AND userpw = ?",
-    [userid, userpw]
-  );
+
+  const [rows] = await db.query("SELECT * FROM users WHERE userid = ?", [
+    userid,
+  ]);
+
   if (rows.length > 0) {
-    const token = jwt.sign(
-      { id: rows[0].id, userid: rows[0].userid },
-      jwtSecret,
-      {
-        expiresIn: "1h",
-      }
-    );
-    res.json({ message: "로그인 성공", token });
+    const isMatch = await bcrypt.compare(userpw, rows[0].userpw);
+
+    if (isMatch) {
+      const token = jwt.sign(
+        { id: rows[0].id, userid: rows[0].userid },
+        config.jwt.secretKey,
+        {
+          expiresIn: config.jwt.expiresInSec,
+        }
+      );
+      res.json({ message: "로그인 성공", token });
+    } else {
+      res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+    }
   } else {
-    res.status(401).json({ message: "로그인 실패" });
+    res
+      .status(401)
+      .json({ message: "로그인 실패: 사용자 정보를 찾을 수 없습니다." });
   }
 }
