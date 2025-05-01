@@ -1,3 +1,5 @@
+![ERD](ERD.png)
+
 # API 테스트 결과
 
 ## 📸 회원가입 API
