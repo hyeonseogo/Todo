@@ -4,78 +4,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TodoList</title>
-    <style>
-      @font-face {
-        font-family: "Ownglyph_corncorn-Rg";
-        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2412-1@1.0/Ownglyph_corncorn-Rg.woff2")
-          format("woff2");
-      }
-      body {
-        font-family: Ownglyph_corncorn-Rg;
-        padding: 20px;
-        max-width: 600px;
-        margin: auto;
-      }
-      input,
-      button {
-        font-family: Ownglyph_corncorn-Rg;
-        font-size: 1.5rem;
-        padding: 8px;
-        margin-right: 5px;
-      }
-      button:hover {
-        transform: scale(1.2);
-      }
-      button {
-        background-color: beige;
-        border-radius: 50%;
-      }
-      ul {
-        list-style: none;
-        padding: 0;
-      }
-      li {
-        font-size: 1.5rem;
-        padding: 8px;
-        margin: 5px 0;
-        background: #f0f0f0;
-        border-radius: 4px;
-        display: flex;
-        justify-content: space-between;
-      }
-      .controls button {
-        margin-left: 5px;
-      }
-      span {
-        margin: auto;
-      }
-    </style>
+    <link rel="stylesheet" href="/todos.css" />
   </head>
 
   <body>
-    <h2>나의 할 일</h2>
-    <input type="text" id="todoInput" placeholder="할 일을 입력하세요" />
-    <button onclick="addTodo()">추가</button>
+    <h2>나의 할 일 📝</h2>
+    <div class="todo-input-container">
+      <input type="text" id="todoInput" placeholder="할 일을 입력하세요" />
+      <button onclick="addTodo()">추가</button>
+    </div>
 
-    <h2>할 일 목록</h2>
+    <h2>할 일 목록 🗂️</h2>
     <ul id="todoList"></ul>
 
-    <h2>특정 할 일 조회</h2>
-    <input
-      type="text"
-      id="todoTextInput"
-      placeholder="할 일 텍스트를 입력하세요"
-    />
-    <button onclick="findTodo()">조회</button>
+    <h2>특정 할 일 조회 🔍</h2>
+    <div class="find-container">
+      <input
+        type="text"
+        id="todoTextInput"
+        placeholder="할 일을 정확히 입력하세요"
+      />
+      <button onclick="findTodo()">조회</button>
+    </div>
     <div id="findResult"></div>
 
     <script>
       const token = localStorage.getItem("token");
 
-      // 로그인되지 않았을 때 로그인 페이지로 리디렉션
+      console.log("Token: ", token);
+
       if (!token) {
         alert("로그인이 필요합니다!");
-        window.location.href = "/login.html";
+        window.location.href = "/login.html"; // 로그인 페이지로 리디렉션
+      } else {
+        // 토큰이 있을 때만 할 일 목록을 불러옴
+        window.onload = function () {
+          loadTodos(); // loadTodos를 명시적으로 호출
+        };
       }
 
       async function loadTodos() {
@@ -238,8 +203,6 @@
           alert("할 일 조회 중 오류가 발생했습니다.");
         }
       }
-
-      window.onload = loadTodos;
     </script>
   </body>
 </html>
