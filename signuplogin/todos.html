@@ -19,11 +19,7 @@
 
     <h2>특정 할 일 조회 🔍</h2>
     <div class="find-container">
-      <input
-        type="text"
-        id="todoTextInput"
-        placeholder="할 일을 정확히 입력하세요"
-      />
+      <input type="text" id="todoTextInput" placeholder="할 일을 입력하세요" />
       <button onclick="findTodo()">조회</button>
     </div>
     <div id="findResult"></div>
@@ -35,11 +31,10 @@
 
       if (!token) {
         alert("로그인이 필요합니다!");
-        window.location.href = "/login.html"; // 로그인 페이지로 리디렉션
+        window.location.href = "/login.html";
       } else {
-        // 토큰이 있을 때만 할 일 목록을 불러옴
         window.onload = function () {
-          loadTodos(); // loadTodos를 명시적으로 호출
+          loadTodos();
         };
       }
 

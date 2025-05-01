@@ -21,8 +21,6 @@ app.get("/", (req, res) => {
 app.use("/users", userRouter);
 app.use("/todos", todoRouter);
 
-app.use(express.static("signuplogin"));
-
 app.listen(3000, () => {
   console.log("서버 실행 중: http://localhost:3000");
 });
