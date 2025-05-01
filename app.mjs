@@ -1,17 +1,26 @@
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import userRouter from "./router/userRouter.mjs";
 import todoRouter from "./router/todoRouter.mjs";
 
 const app = express();
 
-// express.json()으로 JSON 요청 처리
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.json());
 
-// 라우터 설정
+app.use(express.static(path.join(__dirname, "signuplogin")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "signuplogin", "signup.html"));
+});
+
 app.use("/users", userRouter);
 app.use("/todos", todoRouter);
 
-// 정적 파일 서빙
 app.use(express.static("signuplogin"));
 
 app.listen(3000, () => {

@@ -11,7 +11,6 @@ import { authenticateToken } from "../middleware/auth.mjs";
 
 const router = express.Router();
 
-// 모든 요청에 인증 미들웨어 적용
 router.use(authenticateToken);
 
 router.get("/search", searchTodos);
