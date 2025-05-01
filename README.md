@@ -1,49 +1,63 @@
-# 프로젝트 API 테스트 결과
+# API 테스트 결과
 
-이 문서에서는 프로젝트의 API 테스트 결과를 보여줍니다. 각 API 요청과 응답을 확인할 수 있습니다.
+## 📸 회원가입 API
+
+- **테스트 결과:**
+  ![회원가입 API 테스트 결과](screenshot/signup.png)
+
+## 📸 로그인 API
+
+- **테스트 결과:**
+  ![로그인 API 테스트 결과](screenshot/login.png)
+
+## 📸 나의 할 일 API
+
+### (1) 나의 할 일 페이지 & 콘솔창에 토큰
+
+![나의 할 일 API 테스트 결과](screenshot/todo_1.png)
+
+### (2) 할 일 추가
+
+![나의 할 일 API 테스트 결과](screenshot/todo_2.png)
+
+### (3) 할 일 수정
+
+![나의 할 일 API 테스트 결과](screenshot/todo_3.png)
+
+### (4) 할 일 저장
+
+![나의 할 일 API 테스트 결과](screenshot/todo_4.png)
+
+### (5) 할 일 삭제
+
+![나의 할 일 API 테스트 결과](screenshot/todo_5.png)
+
+### (6) 할 일 검색
+
+![나의 할 일 API 테스트 결과](screenshot/todo_6.png)
 
 ---
 
-## 🟢 회원가입 - POST /users/signup
+## 📸 DB 결과
 
-회원가입 API는 사용자가 입력한 정보를 데이터베이스에 저장하는 API입니다.
+### 1. `users` 테이블에 사용자 추가
 
-- **요청:**
+![DB 결과](screenshot/DB_users.png)
 
-````json
-{
-  "userid": "testuser",
-  "userpw": "1234",
-  "name": "홍길동",
-  "email": "test@example.com"
+### 2. `todos` 테이블에 할 일 추가
+
+![DB 결과](screenshot/DB_todos.png)
+
+---
+
+## VScode 콘솔 창
+
+서버 실행 중: http://localhost:3000
+회원가입 요청 받음
+회원가입 요청 받음: {
+userid: 'hsgo',
+userpw: '12341234',
+name: '현서',
+email: 'hsgo@hsgo.com'
 }
-
-{
-  "userId": 1
-}
-
-🟢 로그인 - POST /users/login
-
-로그인 API는 사용자가 입력한 아이디와 비밀번호를 확인하여 JWT 토큰을 발급하는 API입니다.
-
-- **요청:**
-```json
-{
-  "userid": "testuser",
-  "userpw": "1234"
-}
-
-{
-  "message": "로그인 성공",
-  "token": "jwt_token_example"
-}
-
-🟢 할 일 목록 조회 - GET /todos
-
-이 API는 사용자가 등록한 할 일 목록을 불러오는 API입니다.
-
-{
-  "Authorization": "Bearer jwt_token_example"
-}
-
-````
+로그인 요청 받음
