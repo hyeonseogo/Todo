@@ -1,3 +1,5 @@
+## 📊 ERD (Entity Relationship Diagram)
+
 ![ERD](ERD.png)
 
 # API 테스트 결과
