@@ -5,6 +5,8 @@
 ## 📸 회원가입 API
 
 - **테스트 결과:**
+  ![회원가입 API 테스트 결과](screenshot/signup_error1.png)
+  ![회원가입 API 테스트 결과](screenshot/signup_error2.png)
   ![회원가입 API 테스트 결과](screenshot/signup.png)
 
 ## 📸 로그인 API
