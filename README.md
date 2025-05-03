@@ -49,17 +49,3 @@
 ### 2. `todos` 테이블에 할 일 추가
 
 ![DB](screenshot/DB_todos.png)
-
----
-
-## VScode 콘솔 창
-
-서버 실행 중: http://localhost:3000
-회원가입 요청 받음
-회원가입 요청 받음: {
-userid: 'hsgo',
-userpw: '12341234',
-name: '현서',
-email: 'hsgo@hsgo.com'
-}
-로그인 요청 받음
